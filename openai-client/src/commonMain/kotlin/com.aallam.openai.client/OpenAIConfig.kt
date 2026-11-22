@@ -105,6 +105,62 @@ public class OpenAIHost(
         public val Gemini: OpenAIHost = OpenAIHost(baseUrl = "https://generativelanguage.googleapis.com/v1beta/openai/")
 
         /**
+         * A pre-configured instance of [OpenAIHost] for OpenRouter.
+         */
+        public val OpenRouter: OpenAIHost = OpenAIHost(baseUrl = "https://openrouter.ai/api/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Groq.
+         */
+        public val Groq: OpenAIHost = OpenAIHost(baseUrl = "https://api.groq.com/openai/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for DeepSeek.
+         */
+        public val DeepSeek: OpenAIHost = OpenAIHost(baseUrl = "https://api.deepseek.com/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Mistral AI.
+         */
+        public val Mistral: OpenAIHost = OpenAIHost(baseUrl = "https://api.mistral.ai/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for xAI (Grok).
+         */
+        public val XAI: OpenAIHost = OpenAIHost(baseUrl = "https://api.x.ai/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Together AI.
+         */
+        public val Together: OpenAIHost = OpenAIHost(baseUrl = "https://api.together.ai/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Fireworks AI.
+         */
+        public val Fireworks: OpenAIHost = OpenAIHost(baseUrl = "https://api.fireworks.ai/inference/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Cerebras.
+         */
+        public val Cerebras: OpenAIHost = OpenAIHost(baseUrl = "https://api.cerebras.ai/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Anthropic's OpenAI SDK compatibility layer.
+         * Anthropic intends this layer for testing and comparing models; it supports chat completions only.
+         */
+        public val Anthropic: OpenAIHost = OpenAIHost(baseUrl = "https://api.anthropic.com/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for Ollama Cloud (requires an Ollama API key).
+         */
+        public val OllamaCloud: OpenAIHost = OpenAIHost(baseUrl = "https://ollama.com/v1/")
+
+        /**
+         * A pre-configured instance of [OpenAIHost] for a local Ollama server on its default port.
+         */
+        public val OllamaLocal: OpenAIHost = OpenAIHost(baseUrl = "http://localhost:11434/v1/")
+
+        /**
          * Creates an instance of [OpenAIHost] configured for Azure hosting with the given resource name, deployment ID,
          * and API version.
          *
