@@ -5,6 +5,7 @@ import com.aallam.openai.api.batch.Batch
 import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
+import com.aallam.openai.api.chat.Effort
 import com.aallam.openai.api.chat.TextContent
 import com.aallam.openai.api.core.Endpoint
 import com.aallam.openai.api.core.Role
@@ -14,6 +15,7 @@ import com.aallam.openai.api.file.fileUpload
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.internal.JsonLenient
 import com.aallam.openai.client.internal.asSource
+import com.aallam.openai.client.internal.withTestCleanup
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -62,10 +64,10 @@ class TestBatches : TestOpenAI() {
     @Test
     fun batches() = test {
         val systemPrompt =
-            "Your goal is to extract movie categories from movie descriptions, as well as a 1-sentence summary for these movies."
+            "Return the movie genre and a summary of at most ten words."
         val descriptions = listOf(
-            "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-            "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son.",
+            "Two prisoners find friendship and redemption.",
+            "An aging crime boss hands power to his reluctant son.",
         )
 
         val requestInputs = descriptions.mapIndexed { index, input ->
@@ -74,7 +76,9 @@ class TestBatches : TestOpenAI() {
                 method = Method.Post,
                 url = "/v1/chat/completions",
                 body = ChatCompletionRequest(
-                    model = ModelId("gpt-3.5-turbo"),
+                    model = ModelId("gpt-6-luna"),
+                    reasoningEffort = Effort("none"),
+                    maxCompletionTokens = 32,
                     messages = listOf(
                         ChatMessage(
                             role = Role.System,
@@ -98,23 +102,24 @@ class TestBatches : TestOpenAI() {
             }
             purpose = Purpose("batch")
         }
-        val batchFile = openAI.file(fileRequest)
+        withTestCleanup {
+            val batchFile = openAI.file(fileRequest)
+            afterTest { openAI.delete(fileId = batchFile.id) }
 
-        val request = batchRequest {
-            inputFileId = batchFile.id
-            endpoint = Endpoint.Completions
-            completionWindow = CompletionWindow.TwentyFourHours
+            val request = batchRequest {
+                inputFileId = batchFile.id
+                endpoint = Endpoint.Completions
+                completionWindow = CompletionWindow.TwentyFourHours
+            }
+
+            val batch = openAI.batch(request = request)
+            afterTest { openAI.cancel(id = batch.id) }
+            val fetchedBatch = openAI.batch(id = batch.id)
+            assertEquals(batch.id, fetchedBatch?.id)
+
+            val batches = openAI.batches()
+            assertContains(batches.map { it.id }, batch.id)
         }
-
-        val batch = openAI.batch(request = request)
-        val fetchedBatch = openAI.batch(id = batch.id)
-        assertEquals(batch.id, fetchedBatch?.id)
-
-        val batches = openAI.batches()
-        assertContains(batches.map { it.id }, batch.id)
-
-        openAI.cancel(id = batch.id)
-        openAI.delete(fileId = batchFile.id)
     }
 
     private fun buildJsonlFile(requests: List<RequestInput>, json: Json = Json): String = buildString {

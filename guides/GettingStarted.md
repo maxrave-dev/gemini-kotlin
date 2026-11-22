@@ -11,38 +11,57 @@ val openAI = OpenAI(apiKey)
 
 Use your `OpenAI` instance to make API requests.
 
+- [Responses](#responses)
+  - [Create response](#create-response)
+  - [Retrieve a response](#retrieve-a-response)
+  - [Cancel a response](#cancel-a-response)
+  - [Delete a response](#delete-a-response)
+  - [List response input items](#list-response-input-items)
 - [Models](#models)
-    - [List models](#list-models)
-    - [Retrieve a model](#retrieve-a-model)
+  - [List models](#list-models)
+  - [Retrieve a model](#retrieve-a-model)
 - [Chat](#chat)
-    - [Create chat completion](#create-chat-completion)
+  - [Create chat completion](#create-chat-completion)
 - [Images](#images)
-    - [Create image](#create-image)
-    - [Edit images](#edit-images)
-    - [Create image variation](#create-image-variation)
+  - [Create image](#create-image)
+  - [Edit images](#edit-images)
+  - [Create image variation](#create-image-variation)
 - [Embeddings](#embeddings)
-    - [Create embeddings](#create-embeddings)
+  - [Create embeddings](#create-embeddings)
 - [Fine-tuning](#fine-tuning)
-    - [Create fine-tuning job](#create-fine-tuning-job)
-    - [List fine-tuning jobs](#list-fine-tuning-jobs)
-    - [Retrieve fine-tuning job](#retrieve-fine-tuning-job)
-    - [Cancel fine-tuning](#cancel-fine-tuning)
-    - [List fine-tuning events](#list-fine-tuning-events)
+  - [Create fine-tuning job](#create-fine-tuning-job)
+  - [List fine-tuning jobs](#list-fine-tuning-jobs)
+  - [Retrieve fine-tuning job](#retrieve-fine-tuning-job)
+  - [Cancel fine-tuning](#cancel-fine-tuning)
+  - [List fine-tuning events](#list-fine-tuning-events)
 - [Audio](#audio)
-    - [Create speech](#create-speech) 
-    - [Create transcription](#create-transcription)
-    - [Create translation](#create-translation)
+  - [Create speech](#create-speech)
+  - [Create transcription](#create-transcription)
+  - [Create translation](#create-translation)
 - [Files](#files)
-    - [List files](#list-files)
-    - [Upload file](#upload-file)
-    - [Delete file](#delete-file)
-    - [Retrieve file](#retrieve-file)
-    - [Retrieve file content](#retrieve-file-content)
+  - [List files](#list-files)
+  - [Upload file](#upload-file)
+  - [Delete file](#delete-file)
+  - [Retrieve file](#retrieve-file)
+  - [Retrieve file content](#retrieve-file-content)
 - [Moderations](#moderations)
-    - [Create moderation](#create-moderation)
+  - [Create moderation](#create-moderation)
+- [Batch](#batch)
+  - [Create batch](#create-batch)
+  - [Retrieve batch](#retrieve-batch)
+  - [List batches](#list-batches)
+  - [Cancel batch](#cancel-batch)
+- [Vector stores](#vector-stores)
+  - [Create vector store](#create-vector-store)
+  - [List vector stores](#list-vector-stores)
+  - [Retrieve vector store](#retrieve-vector-store)
+  - [Update vector store](#update-vector-store)
+  - [Delete vector store](#delete-vector-store)
+  - [Attach file to vector store](#attach-file-to-vector-store)
+  - [Batch files into vector store](#batch-files-into-vector-store)
 - [Hosts](#hosts)
-    - [Azure](#azure)
-    - [Other hosts](#other-hosts)
+  - [Azure](#azure)
+  - [Other hosts](#other-hosts)
 
 #### Beta
 
@@ -52,10 +71,6 @@ Use your `OpenAI` instance to make API requests.
   - [Modify assistant](#modify-assistant)
   - [Delete assistant](#delete-assistant)
   - [List assistants](#list-assistants)
-  - [Create assistant file](#create-assistant-file)
-  - [Retrieve assistant file](#retrieve-assistant-file)
-  - [Delete assistant file](#delete-assistant-file)
-  - [List assistant files](#list-assistant-files)
 - [Threads](#threads)
   - [Create thread](#create-thread)
   - [Retrieve thread](#retrieve-thread)
@@ -66,8 +81,6 @@ Use your `OpenAI` instance to make API requests.
   - [Retrieve message](#retrieve-message)
   - [Modify message](#modify-message)
   - [List messages](#list-messages)
-  - [Retrieve message file](#retrieve-message-file)
-  - [List message files](#list-message-files)
 - [Runs](#runs)
   - [Create run](#create-run)
   - [Retrieve run](#retrieve-run)
@@ -77,20 +90,66 @@ Use your `OpenAI` instance to make API requests.
   - [Create thread and run](#create-thread-and-run)
   - [Retrieve a run step](#retrieve-a-run-step)
   - [List run steps](#list-run-steps)
+  - [Event streaming](#event-streaming)
 
 #### Deprecated
 
 - [Completions](#completions)
-    - [Create completion](#create-completion-legacy)
+  - [Create completion](#create-completion-legacy)
 - [Fine-tunes](#fine-tunes)
-    - [Create fine-tune](#create-fine-tune)
-    - [List fine-tunes](#list-fine-tunes)
-    - [Retrieve fine-tune](#retrieve-fine-tune)
-    - [Cancel fine-tune](#cancel-fine-tune)
-    - [List fine-tune events](#list-fine-tune-events)
-    - [Delete fine-tune model](#delete-fine-tune-model)
+  - [Create fine-tune](#create-fine-tune)
+  - [List fine-tunes](#list-fine-tunes)
+  - [Retrieve fine-tune](#retrieve-fine-tune)
+  - [Cancel fine-tune](#cancel-fine-tune)
+  - [List fine-tune events](#list-fine-tune-events)
+  - [Delete fine-tune model](#delete-fine-tune-model)
 - [Edits](#edits)
-    - [Create edits](#create-edits-deprecated)
+  - [Create edits](#create-edits-deprecated)
+
+## Responses
+
+Create model responses with the Responses API.
+
+### Create response
+
+```kotlin
+val response = openAI.response(
+    request = ResponseRequest(
+        model = ModelId("gpt-4.1"),
+        input = ResponseInput("Write a haiku about Kotlin.")
+    )
+)
+
+println(response.outputText)
+```
+
+### Retrieve a response
+
+```kotlin
+val responseId = ResponseId("resp_123")
+val response = openAI.response(responseId)
+```
+
+### Cancel a response
+
+```kotlin
+val responseId = ResponseId("resp_123")
+val cancelled = openAI.cancel(responseId)
+```
+
+### Delete a response
+
+```kotlin
+val responseId = ResponseId("resp_123")
+val deleted = openAI.delete(responseId)
+```
+
+### List response input items
+
+```kotlin
+val responseId = ResponseId("resp_123")
+val inputItems = openAI.responseInputItems(id = responseId, limit = 20)
+```
 
 ## Models
 
@@ -110,7 +169,7 @@ val models: List<Model> = openAI.models()
 Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
 
 ```kotlin
-val id = ModelId("text-ada-001")
+val id = ModelId("gpt-4.1")
 val model: Model = openAI.model(id)
 ```
 
@@ -123,8 +182,8 @@ Given a chat conversation, the model will return a chat completion response.
 Creates a completion for the chat message.
 
 ```kotlin
-val chatCompletionRequest = ChatCompletionRequest(
-    model = ModelId("gpt-3.5-turbo"),
+val request = ChatCompletionRequest(
+    model = ModelId("gpt-4o-mini"),
     messages = listOf(
         ChatMessage(
             role = ChatRole.System,
@@ -136,61 +195,58 @@ val chatCompletionRequest = ChatCompletionRequest(
         )
     )
 )
-val completion: ChatCompletion = openAI.chatCompletion(chatCompletionRequest)
-// or, as flow
-val completions: Flow<ChatCompletionChunk> = openAI.chatCompletions(chatCompletionRequest)
+
+val completion: ChatCompletion = openAI.chatCompletion(request)
+
+// Or stream as a Flow
+val chunks: Flow<ChatCompletionChunk> = openAI.chatCompletions(request)
 ```
 
 ## Images
 
-Given a prompt and/or an input image, the model will generate a new image.
+Use a current GPT Image model for generation and editing. These operations return base64 image data and response metadata. See the [Images guide](Images.md) for streaming, controls, usage and image reference options.
 
-### Create image
+### Generate an image
 
-Creates an image given a prompt.
-
-````kotlin
-val images = openAI.imageURL( // or openAI.imageJSON
-    creation = ImageCreation(
+```kotlin
+val response = openAI.image(
+    ImageGenerationRequest(
         prompt = "A cute baby sea otter",
-        model = ModelId("dall-e-3"),
-        n = 2,
-        size = ImageSize.is1024x1024
-    )
-)
-````
-
-### Edit images
-
-Creates an edited or extended image given an original image and a prompt.
-
-````kotlin
-val images = openAI.imageURL( // or openAI.imageJSON
-    edit = ImageEdit(
-        image = FileSource(name = "<filename>", source = imageSource),
-        model = ModelId("dall-e-2"),
-        mask = FileSource(name = "<filename>", source = maskSource),
-        prompt = "a sunlit indoor lounge area with a pool containing a flamingo",
+        model = ModelId("gpt-image-2.5-sunburst"),
         n = 1,
-        size = ImageSize.is1024x1024
+        size = ImageSize.is1024x1024,
+        quality = Quality.Low,
+        outputFormat = ImageOutputFormat.Png,
     )
 )
-````
+val base64Image = response.data.single().b64JSON
+val usage = response.usage
+```
 
-### Create image variation
+### Edit an uploaded image
 
-Creates a variation of a given image.
+Upload an image with the Files API, then reference its ID. The mask is optional. Delete the uploaded input when it is no longer needed.
 
-````kotlin
-val images = openAI.imageURL( // or openAI.imageJSON
-    variation = ImageVariation(
-        image = FileSource(name = "<filename>", source = imageSource),
-        model = ModelId("dall-e-3"),
-        n = 1,
-        size = ImageSize.is1024x1024
-    )
+```kotlin
+val input = openAI.file(
+    FileUpload(FileSource(path = Path("image.png")), purpose = Purpose("vision"))
 )
-````
+try {
+    val response = openAI.image(
+        ImageEditRequest(
+            images = listOf(ImageReference.file(input.id)),
+            prompt = "Add a flamingo floating in the pool",
+            model = ModelId("gpt-image-2.5-sunburst"),
+            n = 1,
+        )
+    )
+    val base64Image = response.data.single().b64JSON
+} finally {
+    openAI.delete(input.id)
+}
+```
+
+DALL-E models and their URL/variation workflows have retired from OpenAI. The legacy methods remain available for compatible providers; use `image()` and `imageEvents()` for current OpenAI image models. The JVM sample and live image tests accept `OPENAI_IMAGE_MODEL` to select another supported GPT Image model. Changing that setting does not bypass model-specific parameter constraints.
 
 ## Embeddings
 
@@ -200,14 +256,14 @@ Get a vector representation of a given input that can be easily consumed by mach
 
 Creates an embedding vector representing the input text.
 
-````kotlin
+```kotlin
 val embeddings = openAI.embeddings(
     request = EmbeddingRequest(
-        model = ModelId("text-similarity-babbage-001"),
-        input = listOf("The food was delicious and the waiter...")
+        model = ModelId("text-embedding-3-small"),
+        input = listOf("The food was delicious and the waiter was very friendly.")
     )
 )
-````
+```
 
 ## Fine-tuning
 
@@ -217,8 +273,6 @@ Manage fine-tuning jobs to tailor a model to your specific training data.
 
 Creates a job that fine-tunes a specified model from a given dataset.
 
-Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
-
 #### No Hyperparameters
 
 ```kotlin
@@ -226,7 +280,7 @@ val request = FineTuningRequest(
     trainingFile = FileId("file-abc123"),
     model = ModelId("gpt-3.5-turbo"),
 )
-val fineTuningJob = client.fineTuningJob(request)
+val fineTuningJob = openAI.fineTuningJob(request)
 ```
 
 #### Hyperparameters
@@ -237,7 +291,7 @@ val request = FineTuningRequest(
     model = ModelId("gpt-3.5-turbo"),
     hyperparameters = Hyperparameters(nEpochs = 2),
 )
-val fineTuningJob = client.fineTuningJob(request)
+val fineTuningJob = openAI.fineTuningJob(request)
 ```
 
 #### Validation File
@@ -245,18 +299,18 @@ val fineTuningJob = client.fineTuningJob(request)
 ```kotlin
 val request = FineTuningRequest(
     trainingFile = FileId("file-abc123"),
-    validation_file = FileId("file-def345"),
+    validationFile = FileId("file-def345"),
     model = ModelId("gpt-3.5-turbo"),
 )
-val fineTuningJob = client.fineTuningJob(request)
+val fineTuningJob = openAI.fineTuningJob(request)
 ```
 
 ### List fine-tuning jobs
 
-List your organization's fine-tuning jobs
+List your organization's fine-tuning jobs.
 
 ```kotlin
-val fineTuningJobs = client.fineTuningJobs(limit = 2)
+val fineTuningJobs = openAI.fineTuningJobs(limit = 20)
 ```
 
 ### Retrieve fine-tuning job
@@ -264,17 +318,17 @@ val fineTuningJobs = client.fineTuningJobs(limit = 2)
 Get info about a fine-tuning job.
 
 ```kotlin
-val id = FineTuningId("ft-AF1WoRqd3aJAHsqc9NY7iL8F")
-val fineTuningJob = client.fineTuningJob(id)
+val id = FineTuningId("ftjob-abc123")
+val fineTuningJob = openAI.fineTuningJob(id)
 ```
 
 ### Cancel fine-tuning
 
-Immediately cancel a fine-tune job.
+Immediately cancel a fine-tuning job.
 
 ```kotlin
-val id = FineTuningId("ftjob-abc12")
-client.cancel(id)
+val id = FineTuningId("ftjob-abc123")
+openAI.cancel(id)
 ```
 
 ### List fine-tuning events
@@ -282,8 +336,8 @@ client.cancel(id)
 Get status updates for a fine-tuning job.
 
 ```kotlin
-val id = FineTuningId("ftjob-abc12")
-val fineTuningEvents = client.fineTuningEvents(id)
+val id = FineTuningId("ftjob-abc123")
+val fineTuningEvents = openAI.fineTuningEvents(id)
 ```
 
 ## Audio
@@ -296,11 +350,11 @@ Generates audio from the input text.
 
 ```kotlin
 val rawAudio = openAI.speech(
-  request = SpeechRequest(
-    model = ModelId("tts-1"),
-    input = "The quick brown fox jumped over the lazy dog.",
-    voice = Voice.Alloy,
-  )
+    request = SpeechRequest(
+        model = ModelId("tts-1"),
+        input = "The quick brown fox jumped over the lazy dog.",
+        voice = Voice.Alloy,
+    )
 )
 ```
 
@@ -310,7 +364,7 @@ Transcribes audio into the input language.
 
 ```kotlin
 val request = TranscriptionRequest(
-    audio = FileSource(name = "<filename>", source = audioSource),
+    audio = FileSource(path = Path("micro-machines.wav")),
     model = ModelId("whisper-1"),
 )
 val transcription = openAI.transcription(request)
@@ -322,7 +376,7 @@ Translates audio into English.
 
 ```kotlin
 val request = TranslationRequest(
-    audio = FileSource(name = "<filename>", source = audioSource),
+    audio = FileSource(path = Path("multilingual.wav")),
     model = ModelId("whisper-1"),
 )
 val translation = openAI.translation(request)
@@ -330,212 +384,285 @@ val translation = openAI.translation(request)
 
 ## Files
 
-Files are used to upload documents that can be used with features like [Fine-tuning](#fine-tunes).
+Files are used to upload documents that can be used across features.
 
 ### List files
 
 Returns a list of files that belong to the user's organization.
 
-````kotlin
+```kotlin
 val files = openAI.files()
-````
+```
 
 ### Upload file
 
 Upload a file that contains document(s) to be used across various endpoints/features.
-Currently, the size of all the files uploaded by one organization can be up to 1 GB.
 
-````kotlin
+```kotlin
 val file = openAI.file(
     request = FileUpload(
-        file = source,
+        file = FileSource(path = Path("training.jsonl")),
         purpose = Purpose("fine-tune")
     )
 )
-````
+```
 
 ### Delete file
 
 Delete a file.
 
-````kotlin
-openAI.delete(fileId)
-````
+```kotlin
+openAI.delete(file.id)
+```
 
 ### Retrieve file
 
 Returns information about a specific file.
 
-````kotlin
-val file = openAI.file(fileId)
-````
+```kotlin
+val file = openAI.file(FileId("file-abc123"))
+```
 
 ### Retrieve file content
 
-Returns the contents of the specified file
+Returns the contents of the specified file.
 
-````kotlin
-val bytes = openAI.download(fileId)
-````
+```kotlin
+val bytes = openAI.download(FileId("file-abc123"))
+```
+
+### Modern transcription and streaming
+
+Keep using `TranscriptionRequest` for the file, model and output format. Pass
+`TranscriptionOptions` to obtain an `AudioTranscription` with token confidence,
+usage, detected languages and speaker-labeled `diarizedSegments`:
+
+```kotlin
+val result = openAI.transcribe(
+    request = transcriptionRequest,
+    options = TranscriptionOptions(
+        include = listOf("logprobs"),
+        languages = listOf("en", "fr"),
+        chunkingStrategy = TranscriptionChunkingStrategy.Auto,
+    ),
+)
+openAI.transcriptions(transcriptionRequest).collect { event ->
+    event.delta?.let(::print)
+}
+```
+
+For speaker labels, select `AudioResponseFormat.DiarizedJson` and a model that
+supports diarization. Timestamp segments remain available separately as
+`segments`. Supported options and formats depend on the model; accepting a
+`ModelId` does not establish server-side support.
+
+```kotlin
+val options = SpeechOptions(
+    instructions = "Speak calmly.",
+    customVoice = CustomVoice("voice_123"),
+)
+openAI.speechAudio(speechRequest, options).collect { bytes ->
+    // Send each binary audio chunk to your player.
+}
+openAI.speechEvents(speechRequest, options).collect { event ->
+    // Handle base64 audio events and completion usage.
+}
+```
+
+A custom voice replaces the request's built-in voice. `speechAudio` selects binary
+framing; `speechEvents` selects SSE framing. Flow collection starts the request,
+and cancelling collection closes its response. Existing `speech(request)` still
+returns the complete audio as a byte array. Built-in voice/format names can also
+be supplied through their string-backed value types.
 
 ## Moderations
 
-Given an input text, outputs if the model classifies it as violating OpenAI's content policy.
+Classify text and image inputs against OpenAI's content policy.
 
 ### Create moderation
 
-Classifies if text violates OpenAI's Content Policy
+Classifies if text violates OpenAI's content policy.
 
-````kotlin
+```kotlin
 val moderation = openAI.moderations(
     request = ModerationRequest(
-        input = "I want to kill them."
+        // Omit the model to use the server default, or choose an available omni-moderation model.
+        input = listOf("I want to kill them.")
     )
 )
-````
+```
+
+For mixed text and images, use typed content parts:
+
+```kotlin
+val moderation = openAI.moderate(
+    MultimodalModerationRequest(
+        input = listOf(
+            ModerationInput.Text("Describe the scene."),
+            ModerationInput.Image("https://example.com/image.png"),
+        ),
+        model = ModerationModel.OmniLatest,
+    )
+)
+```
+
+Omit `model` to use OpenAI's default. Results include category scores and the input
+modalities evaluated for each category through `categoryAppliedInputTypes`.
+
+## Batch
+
+Create and manage asynchronous batches.
+
+### Create batch
+
+```kotlin
+val request = BatchRequest(
+    inputFileId = FileId("file-abc123"),
+    endpoint = Endpoint.Completions,
+    completionWindow = CompletionWindow.TwentyFourHours
+)
+
+val batch = openAI.batch(request)
+```
+
+### Retrieve batch
+
+```kotlin
+val batch = openAI.batch(BatchId("batch_abc123"))
+```
+
+### List batches
+
+```kotlin
+val batches = openAI.batches(limit = 20)
+```
+
+### Cancel batch
+
+```kotlin
+val cancelled = openAI.cancel(BatchId("batch_abc123"))
+```
+
+## Vector Stores
+
+Store and index files for `file_search` use cases.
+
+### Create vector store
+
+```kotlin
+val vectorStore = openAI.createVectorStore(
+    request = VectorStoreRequest(name = "Support FAQ")
+)
+```
+
+### List vector stores
+
+```kotlin
+val vectorStores = openAI.vectorStores(limit = 20)
+```
+
+### Retrieve vector store
+
+```kotlin
+val vectorStore = openAI.vectorStore(VectorStoreId("vs_abc123"))
+```
+
+### Update vector store
+
+```kotlin
+val updated = openAI.updateVectorStore(
+    id = VectorStoreId("vs_abc123"),
+    request = VectorStoreRequest(name = "Support FAQ v2")
+)
+```
+
+### Delete vector store
+
+```kotlin
+val deleted = openAI.delete(VectorStoreId("vs_abc123"))
+```
+
+### Attach file to vector store
+
+```kotlin
+val vectorStoreFile = openAI.createVectorStoreFile(
+    id = VectorStoreId("vs_abc123"),
+    request = VectorStoreFileRequest(fileId = FileId("file-abc123"))
+)
+
+val files = openAI.vectorStoreFiles(id = VectorStoreId("vs_abc123"))
+val removed = openAI.delete(id = VectorStoreId("vs_abc123"), fileId = FileId("file-abc123"))
+```
+
+### Batch files into vector store
+
+```kotlin
+val batch = openAI.createVectorStoreFilesBatch(
+    id = VectorStoreId("vs_abc123"),
+    request = FileBatchRequest(fileIds = listOf(FileId("file-abc123"), FileId("file-def456")))
+)
+
+val retrieved = openAI.vectorStoreFileBatch(
+    vectorStoreId = VectorStoreId("vs_abc123"),
+    batchId = batch.id
+)
+
+val batchFiles = openAI.vectorStoreFilesBatches(
+    vectorStoreId = VectorStoreId("vs_abc123"),
+    batchId = batch.id
+)
+
+val cancelled = openAI.cancel(
+    vectorStoreId = VectorStoreId("vs_abc123"),
+    batchId = batch.id
+)
+```
 
 ## Hosts
 
-This library has support for custom ChatGPT URLs. The host used by default is `https://api.openai.com/v1/`, as you would
-expect, and support for Azure hosted ChatGPT is built in as well.
+This library supports custom OpenAI-compatible hosts. The default host is `https://api.openai.com/v1/`.
 
 ### Azure
 
-To connect to an Azure hosted instance, use the `OpenAIHost.azure` function like so:
+To connect to an Azure-hosted instance, use `OpenAIHost.azure`:
 
-````kotlin
+```kotlin
 val host = OpenAIHost.azure(
-    resourceName = "The name of your Azure OpenAI Resource.",
-    deploymentId = "The name of your model deployment.",
-    apiVersion = "The API version to use for this operation. This parameter should follow the YYYY-MM-DD format.",
+    resourceName = "your-resource-name",
+    deploymentId = "your-deployment-id",
+    apiVersion = "2024-10-21",
 )
+
 val config = OpenAIConfig(
     host = host,
-    token = "Your API token",
+    token = "your-api-token",
 )
+
 val openAI = OpenAI(config)
-````
+```
 
 ### Other hosts
 
-You can connect to whatever host you like by constructing your own `OpenAIHost` instance. Otherwise, it's exactly the
-same as the above Azure example.
+You can connect to any compatible host by constructing your own `OpenAIHost` instance.
 
-````kotlin
+```kotlin
 val host = OpenAIHost(
-    baseUrl = "http://localhost:8080",
+    baseUrl = "http://localhost:8080/v1/",
 )
+
 val config = OpenAIConfig(
     host = host,
-    token = "Your API token",
+    token = "your-api-token",
 )
+
 val openAI = OpenAI(config)
-````
-
----
-
-## Completions
-
-Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of
-alternative tokens at each position.
-
-### Create Completion `legacy`
-
-Creates a completion for the provided prompt and parameters
-
-```kotlin
-val completionRequest = CompletionRequest(
-    model = ModelId("text-ada-001"),
-    prompt = "Somebody once told me the world is gonna roll me",
-    echo = true
-)
-val completion: TextCompletion = openAI.completion(completionRequest)
-// or, as flow
-val completions: Flow<TextCompletion> = openAI.completions(completionRequest)
 ```
 
 ---
-
-## Fine-tunes
-
-Manage fine-tuning jobs to tailor a model to your specific training data.
-
-### Create fine-tune
-
-Creates a job that fine-tunes a specified model from a given dataset.
-
-Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
-
-````kotlin
-val fineTune = openAI.fineTune(
-    request = FineTuneRequest(
-        trainingFile = trainingFile,
-        model = ModelId("ada")
-    )
-)
-````
-
-### List fine-tunes
-
-List your organization's fine-tuning jobs
-
-```kotlin
-val fineTunes = openAI.fineTunes()
-```
-
-### Retrieve fine-tune
-
-Gets info about the fine-tune job.
-
-```kotlin
-val finetune = openAI.fineTune(fineTune.id)
-```
-
-### Cancel fine-tune
-
-Immediately cancel a fine-tune job.
-
-```kotlin
-val finetune = openAI.cancel(fineTune.id)
-```
-
-### List fine-tune events
-
-Get fine-grained status updates for a fine-tune job.
-
-```kotlin
-val fineTuneEvents: List<FineTuneEvent> = openAI.fineTuneEvents(fineTune.id)
-// or, as flow
-val fineTuneEvents: Flow<FineTuneEvent> = openAI.fineTuneEventsFlow(fineTune.id)
-````
-
-### Delete fine-tune model
-
-Delete a fine-tuned model. You must have the Owner role in your organization.
-
-```kotlin
-openAI.delete(fileId)
-```
-
-## Edits
-
-Given a prompt and an instruction, the model will return an edited version of the prompt.
-
-### Create edits `Deprecated`
-
-Creates a new edit for the provided input, instruction, and parameters.
-
-```kotlin
-val edit = openAI.edit(
-    request = EditsRequest(
-        model = ModelId("text-davinci-edit-001"),
-        input = "What day of the wek is it?",
-        instruction = "Fix the spelling mistakes"
-    )
-)
-```
 
 ## Assistants
+
+> OpenAI retired this API on August 26, 2026. The examples below are historical; see [API migration](Migration.md).
 
 Build assistants that can call models and use tools to perform tasks.
 
@@ -545,11 +672,11 @@ Create an assistant with a model and instructions.
 
 ```kotlin
 val assistant = openAI.assistant(
-  request = AssistantRequest(
-    name = "Math Tutor",
-    tools = listOf(AssistantTool.CodeInterpreter),
-    model = ModelId("gpt-4")
-  )
+    request = AssistantRequest(
+        name = "Math Tutor",
+        tools = listOf(AssistantTool.CodeInterpreter),
+        model = ModelId("gpt-4o-mini")
+    )
 )
 ```
 
@@ -567,11 +694,14 @@ Modifies an assistant.
 
 ```kotlin
 val assistant = openAI.assistant(
-    id = AssistantId("asst_abc123"), request = AssistantRequest(
-        instructions = "You are an HR bot, and you have access to files to answer employee questions about company policies. Always response with info from either of the files.",
+    id = AssistantId("asst_abc123"),
+    request = AssistantRequest(
+        instructions = "You are an HR bot. Use file search to answer policy questions.",
         tools = listOf(AssistantTool.FileSearch),
-        model = ModelId("gpt-4"),
-        fileIds = listOf(FileId("file-abc123"), FileId("file-abc123")),
+        toolResources = ToolResources(
+            fileSearch = FileSearchResources(vectorStoreIds = listOf(VectorStoreId("vs_abc123")))
+        ),
+        model = ModelId("gpt-4o-mini"),
     )
 )
 ```
@@ -592,54 +722,15 @@ Returns a list of assistants.
 val assistants = openAI.assistants()
 ```
 
-### Create assistant file
-
-Create an assistant file by attaching a File to an assistant.
-
-```kotlin
-val assistant = openAI.createFile(
-  assistantId = AssistantId("asst_abc123"),
-  fileId = FileId("file_abc123")
-)
-```
-
-### Retrieve assistant file
-
-Retrieve an assistant file.
-
-```kotlin
-val assistant = openAI.file(
-  assistantId = AssistantId("asst_abc123"),
-  fileId = FileId("file_abc123")
-)
-```
-
-### Delete assistant file
-
-Delete an assistant file.
-
-```kotlin
-openAI.delete(
-  assistantId = AssistantId("asst_abc123"),
-  fileId = FileId("file_abc123")
-)
-```
-
-### List assistant files
-
-Returns a list of assistant files.
-
-```kotlin
-val assistantFiles = openAI.files(assistantId = AssistantId("asst_abc123"))
-```
-
 ## Threads
+
+> OpenAI retired this API on August 26, 2026. The examples below are historical; see [API migration](Migration.md).
 
 Create threads that assistants can interact with.
 
 ### Create thread
 
-Create a thread with a prompt and instructions.
+Create a thread with optional initial messages.
 
 ```kotlin
 val thread = openAI.thread()
@@ -659,11 +750,11 @@ Modifies a thread.
 
 ```kotlin
 val thread = openAI.thread(
-  id = ThreadId("thread_abc123"),
-  metadata = mapOf(
-    "modified" to "true",
-    "user" to "abc123"
-  )
+    id = ThreadId("thread_abc123"),
+    metadata = mapOf(
+        "modified" to "true",
+        "user" to "abc123"
+    )
 )
 ```
 
@@ -677,7 +768,9 @@ openAI.delete(id = ThreadId("thread_abc123"))
 
 ## Messages
 
-Create messages within threads
+> OpenAI retired this API on August 26, 2026. The examples below are historical; see [API migration](Migration.md).
+
+Create messages within threads.
 
 ### Create message
 
@@ -685,11 +778,11 @@ Create a message.
 
 ```kotlin
 val message = openAI.message(
-  threadId = ThreadId("thread_abc123"),
-  request = MessageRequest(
-    role = Role.User,
-    content = "How does AI work? Explain it in simple terms.",
-  )
+    threadId = ThreadId("thread_abc123"),
+    request = MessageRequest(
+        role = Role.User,
+        content = "How does AI work? Explain it in simple terms.",
+    )
 )
 ```
 
@@ -699,8 +792,8 @@ Retrieve a message.
 
 ```kotlin
 val message = openAI.message(
-  threadId = ThreadId("thread_abc123"),
-  messageId = MessageId("message_abc123")
+    threadId = ThreadId("thread_abc123"),
+    messageId = MessageId("msg_abc123")
 )
 ```
 
@@ -710,12 +803,12 @@ Modifies a message.
 
 ```kotlin
 val message = openAI.message(
-  threadId = ThreadId("thread_abc123"),
-  messageId = MessageId("message_abc123"),
-  metadata = mapOf(
-    "modified" to "true",
-    "user" to "abc123"
-  )
+    threadId = ThreadId("thread_abc123"),
+    messageId = MessageId("msg_abc123"),
+    metadata = mapOf(
+        "modified" to "true",
+        "user" to "abc123"
+    )
 )
 ```
 
@@ -727,30 +820,9 @@ Returns a list of messages for a given thread.
 val messages = openAI.messages(threadId = ThreadId("thread_abc123"))
 ```
 
-### Retrieve message file
-
-A list of files attached to a `Message`.
-
-```kotlin
-val messageFile = openAI.messageFile(
-  threadId = ThreadId("thread_abc123"),
-  messageId = MessageId("message_abc123"),
-  fileId = FileId("file_abc123")
-)
-```
-
-### List message files
-
-Returns a list of message files.
-
-```kotlin
-val messageFiles = openAI.messageFiles(
-  threadId = ThreadId("thread_abc123"),
-  messageId = MessageId("message_abc123")
-)
-```
-
 ## Runs
+
+> OpenAI retired this API on August 26, 2026. The examples below are historical; see [API migration](Migration.md).
 
 Represents an execution run on a thread.
 
@@ -760,8 +832,8 @@ Create a run.
 
 ```kotlin
 val run = openAI.createRun(
-  threadId = ThreadId("thread_abc123"),
-  request = RunRequest(assistantId = AssistantId("assistant_abc123")),
+    threadId = ThreadId("thread_abc123"),
+    request = RunRequest(assistantId = AssistantId("asst_abc123")),
 )
 ```
 
@@ -771,8 +843,8 @@ Retrieves a run.
 
 ```kotlin
 val run = openAI.getRun(
-  threadId = ThreadId("thread_abc123"),
-  runId = RunId("run_abc123")
+    threadId = ThreadId("thread_abc123"),
+    runId = RunId("run_abc123")
 )
 ```
 
@@ -782,9 +854,9 @@ Modifies a run.
 
 ```kotlin
 val run = openAI.updateRun(
-  threadId = ThreadId("thread_abc123"),
-  runId = RunId("run_abc123"),
-  metadata = mapOf("user_id" to "user_abc123")
+    threadId = ThreadId("thread_abc123"),
+    runId = RunId("run_abc123"),
+    metadata = mapOf("user_id" to "user_abc123")
 )
 ```
 
@@ -798,12 +870,12 @@ val runs = openAI.runs(threadId = ThreadId("thread_abc123"))
 
 ### Cancel run
 
-Cancel a run that is `Status.InProgress`
+Cancel a run that is `Status.InProgress`.
 
 ```kotlin
-openAI.cancel(
-  threadId = ThreadId("thread_abc123"),
-  runId = RunId("run_abc123")
+val cancelled = openAI.cancel(
+    threadId = ThreadId("thread_abc123"),
+    runId = RunId("run_abc123")
 )
 ```
 
@@ -812,7 +884,7 @@ openAI.cancel(
 Create a thread and run it in one request.
 
 ```kotlin
-openAI.createThreadRun(
+val run = openAI.createThreadRun(
     request = ThreadRunRequest(
         assistantId = AssistantId("asst_abc123"),
         thread = ThreadRequest(
@@ -833,9 +905,9 @@ Retrieves a run step.
 
 ```kotlin
 val runStep = openAI.runStep(
-  threadId = ThreadId("thread_abc123"),
-  runId = RunId("run_abc123"),
-  stepId = RunStepId("step_abc123")
+    threadId = ThreadId("thread_abc123"),
+    runId = RunId("run_abc123"),
+    stepId = RunStepId("step_abc123")
 )
 ```
 
@@ -845,61 +917,148 @@ Returns a list of run steps belonging to a run.
 
 ```kotlin
 val runSteps = openAI.runSteps(
-  threadId = ThreadId("thread_abc123"),
-  runId = RunId("run_abc123")
+    threadId = ThreadId("thread_abc123"),
+    runId = RunId("run_abc123")
 )
 ```
 
 ### Event streaming
 
-Create a thread and run it in one request and process streaming events.
+Create a thread+run and process streaming events.
 
 ```kotlin
-openAI.createStreamingThreadRun(
-    request = ThreadRunRequest(
-        assistantId = AssistantId("asst_abc123"),
-        thread = ThreadRequest(
-            messages = listOf(
-                ThreadMessage(
-                    role = Role.User,
-                    content = "Explain deep learning to a 5 year old."
+openAI
+    .createStreamingThreadRun(
+        request = ThreadRunRequest(
+            assistantId = AssistantId("asst_abc123"),
+            thread = ThreadRequest(
+                messages = listOf(
+                    ThreadMessage(
+                        role = Role.User,
+                        content = "Explain deep learning to a 5 year old."
+                    )
                 )
             )
-        ),
+        )
     )
-      .onEach { assistantStreamEvent: AssistantStreamEvent -> println(assistantStreamEvent) }
-      .collect()
+    .onEach { event -> println(event.type) }
+    .collect()
+```
+
+Get typed data from an `AssistantStreamEvent`:
+
+```kotlin
+when (assistantStreamEvent.type) {
+    AssistantStreamEventType.THREAD_CREATED -> {
+        val thread = assistantStreamEvent.getData<Thread>()
+    }
+    AssistantStreamEventType.THREAD_MESSAGE_CREATED -> {
+        val message = assistantStreamEvent.getData<Message>()
+    }
+    AssistantStreamEventType.UNKNOWN -> {
+        val raw = assistantStreamEvent.data
+    }
+    else -> Unit
+}
+```
+
+If a new event type is released before the library is updated, you can deserialize custom payloads with your own serializer:
+
+```kotlin
+if (assistantStreamEvent.type == AssistantStreamEventType.UNKNOWN) {
+    val data = assistantStreamEvent.getData(myCustomSerializer)
+}
+```
+
+---
+
+## Completions
+
+> This is a legacy API. Endpoint support and the availability of individual models are separate; prefer Responses for new integrations.
+
+Given a prompt, the model will return one or more predicted completions, and can also return token probabilities.
+
+### Create completion `legacy`
+
+```kotlin
+val request = CompletionRequest(
+    model = ModelId("text-ada-001"),
+    prompt = "Somebody once told me the world is gonna roll me",
+    echo = true
+)
+
+val completion: TextCompletion = openAI.completion(request)
+
+// Or stream as Flow
+val completions: Flow<TextCompletion> = openAI.completions(request)
+```
+
+---
+
+## Fine-tunes
+
+> OpenAI retired this endpoint on January 4, 2024. It remains in the library for source compatibility; see [API migration](Migration.md).
+
+Legacy fine-tunes API.
+
+### Create fine-tune
+
+```kotlin
+val fineTune = openAI.fineTune(
+    request = FineTuneRequest(
+        trainingFile = FileId("file-abc123"),
+        model = ModelId("ada")
+    )
 )
 ```
 
-Get data object from AssistantStreamEvent.
+### List fine-tunes
 
 ```kotlin
-//Type of data for generic type can be found in AssistantStreamEventType
-when(assistantStreamEvent.type) {
-    AssistantStreamEventType.THREAD_CREATED -> {
-        val thread = assistantStreamEvent.getData<Thread>()
-        ...
-    }
-    AssistantStreamEventType.MESSAGE_CREATED -> {
-        val message = assistantStreamEvent.getData<Message>()
-        ...
-    }
-    AssistantStreamEventType.UNKNOWN -> {
-        //Data field is a string and can be used instead of calling getData
-        val data = assistantStreamEvent.data
-        //Handle unknown message type
-    }
-}
+val fineTunes = openAI.fineTunes()
 ```
 
-If a new event type is released before the library is updated, you can create and deserialize your own type by providing a KSerializer.
+### Retrieve fine-tune
 
 ```kotlin
-when(assistantStreamEvent.type) {
-    AssistantStreamEventType.UNKNOWN -> {
-        val data = assistantStreamEvent.getDate<MyCustomType>(myCustomSerializer)
-        ...
-    }
-}
+val fineTune = openAI.fineTune(FineTuneId("ft-abc123"))
+```
+
+### Cancel fine-tune
+
+```kotlin
+val fineTune = openAI.cancel(FineTuneId("ft-abc123"))
+```
+
+### List fine-tune events
+
+```kotlin
+val events: List<FineTuneEvent> = openAI.fineTuneEvents(FineTuneId("ft-abc123"))
+
+// Or stream as Flow
+val eventsFlow: Flow<FineTuneEvent> = openAI.fineTuneEventsFlow(FineTuneId("ft-abc123"))
+```
+
+### Delete fine-tune model
+
+```kotlin
+val deleted = openAI.delete(ModelId("ft:gpt-3.5-turbo:org:custom:abc123"))
+```
+
+## Edits
+
+> OpenAI retired this endpoint on January 4, 2024. It remains in the library for source compatibility; see [API migration](Migration.md).
+
+Given a prompt and an instruction, the model returns an edited version of the prompt.
+
+### Create edits `Deprecated`
+
+```kotlin
+val edit = openAI.edit(
+    request = EditsRequest(
+        model = ModelId("text-davinci-edit-001"),
+        input = "What day of the wek is it?",
+        instruction = "Fix the spelling mistakes"
+    )
+)
 ```

@@ -2,7 +2,9 @@ package com.aallam.openai.client
 
 import com.aallam.openai.api.chat.*
 import com.aallam.openai.api.chat.ChatResponseFormat.Companion.jsonSchema
+import com.aallam.openai.api.core.FinishReason
 import com.aallam.openai.api.model.ModelId
+import com.aallam.openai.client.internal.reportUsage
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -21,11 +23,13 @@ class TestChatCompletions : TestOpenAI() {
     @Test
     fun chatCompletions() = test {
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 64
             messages {
                 message {
                     role = ChatRole.System
-                    content = "You are a helpful assistant.!"
+                    content = "Answer briefly in one sentence."
                 }
                 message {
                     role = ChatRole.User
@@ -43,17 +47,20 @@ class TestChatCompletions : TestOpenAI() {
         }
 
         val completion = openAI.chatCompletion(request)
+        reportUsage("chat", completion.model, completion.usage)
+        assertEquals(FinishReason.Stop, completion.choices.first().finishReason)
         assertTrue { completion.choices.isNotEmpty() }
 
         val results = mutableListOf<ChatCompletionChunk>()
         openAI.chatCompletions(request).onEach { results += it }.launchIn(this).join()
 
         assertNotEquals(0, results.size)
+        assertEquals(FinishReason.Stop, results.flatMap { it.choices }.last().finishReason)
     }
 
     @Test
     fun chatCompletionsFunction() = test {
-        val modelId = ModelId("gpt-3.5-turbo")
+        val modelId = ModelId("gpt-6-luna")
         val chatMessages = mutableListOf(
             ChatMessage(
                 role = ChatRole.User,
@@ -63,6 +70,8 @@ class TestChatCompletions : TestOpenAI() {
 
         val request = chatCompletionRequest {
             model = modelId
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 128
             messages = chatMessages
             tools {
                 function(
@@ -96,25 +105,30 @@ class TestChatCompletions : TestOpenAI() {
         }
 
         val response = openAI.chatCompletion(request)
+        reportUsage("chat", response.model, response.usage)
+        assertNotEquals(FinishReason.Length, response.choices.first().finishReason)
         val message = response.choices.first().message
         val toolCall = message.toolCalls?.first() as? ToolCall.Function
         assertNotNull(toolCall)
         assertEquals("currentWeather", toolCall.function?.name)
+        assertTrue(toolCall.function.argumentsAsJson().containsKey("location"))
     }
 
     @Test
     fun json() = test {
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo-1106")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 128
             responseFormat = ChatResponseFormat.JsonObject
             messages {
                 message {
                     role = ChatRole.System
-                    content = "You are a helpful assistant.!"
+                    content = "Answer briefly in one sentence."
                 }
                 message {
                     role = ChatRole.System
-                    content = """All your answers should be a valid JSON, using the following JSON schema definition:
+                    content = """Return a compact JSON object with short values, using this schema:
                         | { "type": "object", "properties": { "question": { "type": "string" }, "response": { "type": "string" } }, "required": ["question", "response"] }
                         """.trimMargin()
                 }
@@ -125,6 +139,8 @@ class TestChatCompletions : TestOpenAI() {
             }
         }
         val response = openAI.chatCompletion(request)
+        reportUsage("chat", response.model, response.usage)
+        assertEquals(FinishReason.Stop, response.choices.first().finishReason)
         val content = response.choices.first().message.content.orEmpty()
 
         @Serializable
@@ -163,16 +179,18 @@ class TestChatCompletions : TestOpenAI() {
         )
 
         val request = chatCompletionRequest {
-            model = ModelId("gpt-4o-mini-2024-07-18")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 128
             responseFormat = jsonSchema(jsonSchema)
             messages {
                 message {
                     role = ChatRole.System
-                    content = "You are a helpful assistant.!"
+                    content = "Answer briefly in one sentence."
                 }
                 message {
                     role = ChatRole.System
-                    content = """All your answers should be a valid JSON
+                    content = """Return a compact JSON object with short values.
                         """.trimMargin()
                 }
                 message {
@@ -182,6 +200,8 @@ class TestChatCompletions : TestOpenAI() {
             }
         }
         val response = openAI.chatCompletion(request)
+        reportUsage("chat", response.model, response.usage)
+        assertEquals(FinishReason.Stop, response.choices.first().finishReason)
         val content = response.choices.first().message.content.orEmpty()
 
         @Serializable
@@ -196,7 +216,9 @@ class TestChatCompletions : TestOpenAI() {
     @Test
     fun logprobs() = test {
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo-0125")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 64
             messages {
                 message {
                     role = ChatRole.User
@@ -206,6 +228,7 @@ class TestChatCompletions : TestOpenAI() {
             logprobs = true
         }
         val response = openAI.chatCompletion(request)
+        reportUsage("chat", response.model, response.usage)
         val logprobs = response.choices.first().logprobs
         assertNotNull(logprobs)
         assertEquals(response.usage!!.completionTokens, logprobs.content!!.size)
@@ -216,7 +239,9 @@ class TestChatCompletions : TestOpenAI() {
     fun top_logprobs() = test {
         val expectedTopLogProbs = 5
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo-0125")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 64
             messages {
                 message {
                     role = ChatRole.User
@@ -227,6 +252,7 @@ class TestChatCompletions : TestOpenAI() {
             topLogprobs = expectedTopLogProbs
         }
         val response = openAI.chatCompletion(request)
+        reportUsage("chat", response.model, response.usage)
         val logprobs = response.choices.first().logprobs
         assertNotNull(logprobs)
         assertEquals(response.usage!!.completionTokens, logprobs.content!!.size)
@@ -236,11 +262,13 @@ class TestChatCompletions : TestOpenAI() {
     @Test
     fun cancellable() = test {
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 64
             messages {
                 message {
                     role = ChatRole.System
-                    content = "You are a helpful assistant.!"
+                    content = "Answer briefly in one sentence."
                 }
                 message {
                     role = ChatRole.User
@@ -270,11 +298,13 @@ class TestChatCompletions : TestOpenAI() {
     @Test
     fun streamOptions() = test {
         val request = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo")
+            model = ModelId("gpt-6-luna")
+            reasoningEffort = Effort("none")
+            maxCompletionTokens = 64
             messages {
                 message {
                     role = ChatRole.System
-                    content = "You are a helpful assistant.!"
+                    content = "Answer briefly in one sentence."
                 }
                 message {
                     role = ChatRole.User
@@ -297,6 +327,8 @@ class TestChatCompletions : TestOpenAI() {
         val results = mutableListOf<ChatCompletionChunk>()
         openAI.chatCompletions(request).onEach { results += it }.launchIn(this).join()
 
+        reportUsage("chat-stream", results.last().model, results.last().usage)
+        assertEquals(FinishReason.Stop, results.flatMap { it.choices }.last().finishReason)
         assertNotNull(results.last().usage)
         assertNotNull(results.last().usage?.promptTokens)
         assertNotNull(results.last().usage?.completionTokens)
